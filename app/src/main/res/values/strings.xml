@@ -1,3 +1,11 @@
 <resources>
-    <string name="app_name">MW Weather</string>
+    <string name="app_name">Sunshine Now</string>
+    <string name="city_name">St. Paul, MN</string>
+    <string name="temp">72°</string>
+    <string name="feels_like">Feels like 78°</string>
+    <string name="low">Low 65°</string>
+    <string name="high">High 80°</string>
+    <string name="humidity">Humidity 100%</string>
+    <string name="pressure">Pressure 1023 hPa</string>
+    <string name="sunny_icon">Sunny weather icon</string>
 </resources>
