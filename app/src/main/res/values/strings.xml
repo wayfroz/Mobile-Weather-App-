@@ -8,4 +8,8 @@
     <string name="humidity">Humidity 100%</string>
     <string name="pressure">Pressure 1023 hPa</string>
     <string name="sunny_icon">Sunny weather icon</string>
+    <string name="temp_format">Temperature: %.1f°F</string>
+    <string name="feels_like_format">Feels like: %.1f°F</string>
+    <string name="humidity_format">Humidity: %d%%</string>
+    <string name="pressure_format">Pressure: %d hPa</string>
 </resources>
