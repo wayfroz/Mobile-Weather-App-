@@ -9,17 +9,21 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.uniqueweatherapp.ui.theme.UniqueWeatherAppTheme
+import com.example.uniqueweatherapp.viewmodel.WeatherViewModel
+import com.example.uniqueweatherapp.R
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +41,13 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun WeatherScreen(modifier: Modifier = Modifier) {
+    val viewModel: WeatherViewModel = viewModel()
+    val weather by viewModel.weather.observeAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.fetchWeather("St. Paul", "a1160aed969479de39cbe27819c9de63")
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -56,53 +67,58 @@ fun WeatherScreen(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Location
-        Text(
-            text = stringResource(R.string.city_name),
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Temperature and Icon
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
+        weather?.let {
+            // City Name
             Text(
-                text = stringResource(R.string.temp),
-                fontSize = 48.sp,
-                fontWeight = FontWeight.Bold
+                text = it.name,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
-            Spacer(modifier = Modifier.width(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Image(
-                painter = painterResource(id = R.drawable.sun),
-                contentDescription = stringResource(R.string.sunny_icon),
-                modifier = Modifier.size(48.dp)
+            // Temperature and Icon
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Text(
+                    text = stringResource(R.string.temp_format, it.main.temp),
+                    fontSize = 48.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.width(24.dp))
+
+                Image(
+                    painter = painterResource(id = R.drawable.sun),
+                    contentDescription = stringResource(R.string.sunny_icon),
+                    modifier = Modifier.size(48.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Feels like
+            Text(
+                text = stringResource(R.string.feels_like_format, it.main.feelsLike),
+                fontSize = 16.sp,
+                modifier = Modifier.align(Alignment.CenterHorizontally)
             )
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
-        Text(
-            text = stringResource(R.string.feels_like),
+            Column {
+                Text(text = stringResource(R.string.humidity_format, it.main.humidity))
+                Text(text = stringResource(R.string.pressure_format, it.main.pressure))
+            }
+        } ?: Text(
+            text = "Loading weather...",
             fontSize = 16.sp,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Column {
-            Text(text = stringResource(R.string.low))
-            Text(text = stringResource(R.string.high))
-            Text(text = stringResource(R.string.humidity))
-            Text(text = stringResource(R.string.pressure))
-        }
     }
 }
 
