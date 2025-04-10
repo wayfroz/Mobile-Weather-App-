@@ -26,6 +26,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.uniqueweatherapp.ui.theme.UniqueWeatherAppTheme
 import com.example.uniqueweatherapp.viewmodel.WeatherViewModel
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import kotlinx.coroutines.launch
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +51,18 @@ fun WeatherScreen(modifier: Modifier = Modifier) {
     val weather by viewModel.weather.observeAsState()
     val context = LocalContext.current
     var zipCode by remember { mutableStateOf("") }
+    val errorMessage by viewModel.errorMessage.observeAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            scope.launch {
+                snackbarHostState.showSnackbar(it)
+            }
+            viewModel.clearError()
+        }
+    }
 
     Column(
         modifier = modifier
@@ -143,5 +159,17 @@ fun WeatherScreen(modifier: Modifier = Modifier) {
                 Text(text = stringResource(R.string.pressure_format, it.main.pressure))
             }
         }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Box(modifier = Modifier.fillMaxSize()) {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 56.dp)
+            )
+        }
+
     }
 }

@@ -29,19 +29,18 @@ class ForecastActivity : ComponentActivity() {
             MaterialTheme {
                 val forecastViewModel: ForecastViewModel = viewModel()
                 val forecast by forecastViewModel.forecast.observeAsState(emptyList())
+                val errorMessage by forecastViewModel.errorMessage.observeAsState()
 
                 LaunchedEffect(Unit) {
                     Log.d("ForecastActivity", "Fetching forecast for ZIP: $zipCode")
                     forecastViewModel.fetchForecast(zipCode, "a1160aed969479de39cbe27819c9de63")
                 }
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp)
-                ) {
-                    ForecastScreen(forecast = forecast)
-                }
+                ForecastScreen(
+                    forecast = forecast,
+                    errorMessage = errorMessage,
+                    onErrorShown = { forecastViewModel.clearError() }
+                )
             }
         }
     }
@@ -49,7 +48,20 @@ class ForecastActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ForecastScreen(forecast: List<ForecastItem>) {
+fun ForecastScreen(
+    forecast: List<ForecastItem>,
+    errorMessage: String?,
+    onErrorShown: () -> Unit
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            onErrorShown()
+        }
+    }
+
     val context = LocalContext.current
 
     Scaffold(
@@ -62,7 +74,8 @@ fun ForecastScreen(forecast: List<ForecastItem>) {
                     }
                 }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
         LazyColumn(
             contentPadding = paddingValues,
