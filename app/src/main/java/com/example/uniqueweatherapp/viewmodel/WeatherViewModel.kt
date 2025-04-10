@@ -17,7 +17,7 @@ class WeatherViewModel : ViewModel() {
     fun fetchWeather(city: String, apiKey: String) {
         viewModelScope.launch {
             try {
-                val response = WeatherApiClient.weatherApiService.getWeatherByCity(city, apiKey)
+                val response = WeatherApiClient.weatherApiService.getCurrentWeather(city, apiKey)
                 _weather.value = response
                 Log.d("WeatherViewModel", "Weather fetched successfully for $city")
             } catch (e: Exception) {

@@ -7,7 +7,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
 object WeatherApiClient {
-    private const val BASE_URL = "https://api.openweathermap.org/"
+    private const val BASE_URL = "https://api.openweathermap.org/data/2.5/"
 
     @OptIn(ExperimentalSerializationApi::class)
     val retrofit: Retrofit = Retrofit.Builder()
