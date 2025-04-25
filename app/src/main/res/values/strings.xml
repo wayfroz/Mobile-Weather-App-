@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">MW Weather App</string>
     <string name="enter_zip_code">Enter Zip Code</string>
+    <string name="my_location">My Location</string>
     <string name="get_weather">Get Weather</string>
     <string name="forecast_label">16-Day Forecast</string>
     <string name="invalid_zip">Invalid Zip Code</string>
@@ -9,4 +10,5 @@
     <string name="humidity_format">Humidity: %1$d%%</string>
     <string name="pressure_format">Pressure: %1$d hPa</string>
     <string name="sunny_icon">Sunny icon</string>
+
 </resources>

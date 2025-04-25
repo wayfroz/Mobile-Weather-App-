@@ -53,6 +53,7 @@ dependencies {
 
     // Jetpack Compose + Lifecycle
     implementation(libs.androidx.activity.compose)
+    implementation("com.google.android.gms:play-services-location:21.0.1")
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.runtime.livedata)

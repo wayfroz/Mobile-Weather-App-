@@ -2,6 +2,12 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
 
     <application
         android:allowBackup="true"
@@ -25,6 +31,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.ForecastActivity" />
+        <service
+            android:name=".LocationWeatherService"
+            android:exported="false"
+            android:foregroundServiceType="location" />
+
 
     </application>
 </manifest>

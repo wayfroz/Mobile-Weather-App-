@@ -1,6 +1,8 @@
 package com.example.uniqueweatherapp
 
-import android.content.Intent
+import android.app.Activity
+import android.content.*
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -10,6 +12,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -23,35 +27,77 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.uniqueweatherapp.ui.theme.UniqueWeatherAppTheme
+import com.example.uniqueweatherapp.util.checkPermissionsAndStartService
+import com.example.uniqueweatherapp.util.handlePermissionResult
 import com.example.uniqueweatherapp.viewmodel.WeatherViewModel
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import kotlinx.coroutines.launch
 
-
 class MainActivity : ComponentActivity() {
+
+    private lateinit var receiver: BroadcastReceiver
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val weatherViewModel = ViewModelProvider(this)[WeatherViewModel::class.java]
+
+        receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (intent?.action == LocationWeatherService.WEATHER_UPDATE_ACTION) {
+                    val location = intent.getStringExtra("location") ?: return
+                    weatherViewModel.fetchWeather(location, "a1160aed969479de39cbe27819c9de63")
+                }
+            }
+        }
+
+        val filter = IntentFilter(LocationWeatherService.WEATHER_UPDATE_ACTION)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED)
+        } else {
+            @Suppress("UnspecifiedRegisterReceiverFlag")
+            registerReceiver(receiver, filter)
+        }
+
+
+        checkPermissionsAndStartService(this)
+
         enableEdgeToEdge()
         setContent {
             UniqueWeatherAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    WeatherScreen(modifier = Modifier.padding(innerPadding))
+                    WeatherScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        weatherViewModel = weatherViewModel
+                    )
                 }
             }
         }
     }
+
+    @Suppress("DEPRECATION")
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        handlePermissionResult(requestCode, permissions, grantResults, this)
+    }
 }
 
 @Composable
-fun WeatherScreen(modifier: Modifier = Modifier) {
-    val viewModel: WeatherViewModel = viewModel()
-    val weather by viewModel.weather.observeAsState()
+fun WeatherScreen(
+    modifier: Modifier = Modifier,
+    weatherViewModel: WeatherViewModel
+) {
+    val weather by weatherViewModel.weather.observeAsState()
+    val errorMessage by weatherViewModel.errorMessage.observeAsState()
     val context = LocalContext.current
     var zipCode by remember { mutableStateOf("") }
-    val errorMessage by viewModel.errorMessage.observeAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
@@ -60,7 +106,7 @@ fun WeatherScreen(modifier: Modifier = Modifier) {
             scope.launch {
                 snackbarHostState.showSnackbar(it)
             }
-            viewModel.clearError()
+            weatherViewModel.clearError()
         }
     }
 
@@ -98,7 +144,7 @@ fun WeatherScreen(modifier: Modifier = Modifier) {
         Button(
             onClick = {
                 if (zipCode.length == 5) {
-                    viewModel.fetchWeather(zipCode, "a1160aed969479de39cbe27819c9de63")
+                    weatherViewModel.fetchWeather(zipCode, "a1160aed969479de39cbe27819c9de63")
                 } else {
                     Toast.makeText(context, context.getString(R.string.invalid_zip), Toast.LENGTH_SHORT).show()
                 }
@@ -125,9 +171,21 @@ fun WeatherScreen(modifier: Modifier = Modifier) {
             Text(text = stringResource(R.string.forecast_label))
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(8.dp))
+        IconButton(
+            onClick = {
+                checkPermissionsAndStartService(context as Activity)
+            },
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            Icon(
+                imageVector = Icons.Default.LocationOn,
+                contentDescription = stringResource(R.string.my_location)
+            )
+        }
 
         weather?.let {
+            Spacer(modifier = Modifier.height(24.dp))
             Text(text = it.name, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.align(Alignment.CenterHorizontally))
             Spacer(modifier = Modifier.height(16.dp))
             Row(
@@ -170,6 +228,5 @@ fun WeatherScreen(modifier: Modifier = Modifier) {
                     .padding(top = 56.dp)
             )
         }
-
     }
 }
