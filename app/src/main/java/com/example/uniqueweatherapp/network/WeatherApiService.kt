@@ -11,13 +11,13 @@ interface WeatherApiService {
     suspend fun getCurrentWeather(
         @Query("zip") zip: String,
         @Query("appid") apiKey: String,
-        @Query("units") units: String = "metric"
+        @Query("units") units: String = "imperial"
     ): WeatherResponse
 
     @GET("forecast")
     suspend fun getForecast(
         @Query("zip") zip: String,
         @Query("appid") apiKey: String,
-        @Query("units") units: String = "metric"
+        @Query("units") units: String = "imperial"
     ): ForecastResponse
 }

@@ -35,6 +35,8 @@ import com.example.uniqueweatherapp.util.checkPermissionsAndStartService
 import com.example.uniqueweatherapp.util.handlePermissionResult
 import com.example.uniqueweatherapp.viewmodel.WeatherViewModel
 import kotlinx.coroutines.launch
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.TextStyle
 
 class MainActivity : ComponentActivity() {
 
@@ -116,73 +118,83 @@ fun WeatherScreen(
             .background(Color.White)
             .padding(16.dp)
     ) {
-        Text(
-            text = stringResource(R.string.app_name),
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.LightGray)
-                .padding(12.dp),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
+        Row (
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ) {
+            Text(
+                text = stringResource(R.string.app_name),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        OutlinedTextField(
-            value = zipCode,
-            onValueChange = {
-                if (it.length <= 5 && it.all(Char::isDigit)) zipCode = it
-            },
-            label = { Text(stringResource(R.string.enter_zip_code)) },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(
-            onClick = {
-                if (zipCode.length == 5) {
-                    weatherViewModel.fetchWeather(zipCode, "a1160aed969479de39cbe27819c9de63")
-                } else {
-                    Toast.makeText(context, context.getString(R.string.invalid_zip), Toast.LENGTH_SHORT).show()
-                }
-            },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+        Row (
+            modifier = modifier.align(Alignment.CenterHorizontally)
         ) {
-            Text(text = stringResource(R.string.get_weather))
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Button(
-            onClick = {
-                if (zipCode.length == 5) {
-                    val intent = Intent(context, com.example.uniqueweatherapp.ui.ForecastActivity::class.java)
-                    intent.putExtra("ZIP_CODE", zipCode)
-                    context.startActivity(intent)
-                } else {
-                    Toast.makeText(context, context.getString(R.string.invalid_zip), Toast.LENGTH_SHORT).show()
-                }
-            },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
-            Text(text = stringResource(R.string.forecast_label))
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-        IconButton(
-            onClick = {
-                checkPermissionsAndStartService(context as Activity)
-            },
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        ) {
-            Icon(
-                imageVector = Icons.Default.LocationOn,
-                contentDescription = stringResource(R.string.my_location)
+            IconButton(
+                onClick = {
+                    checkPermissionsAndStartService(context as Activity)
+                },
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = stringResource(R.string.my_location),
+                    modifier = Modifier.size(52.dp)
+                )
+            }
+            OutlinedTextField(
+                value = zipCode,
+                onValueChange = {
+                    if (it.length <= 5 && it.all(Char::isDigit)) zipCode = it
+                },
+                label = {
+                    Text(stringResource(R.string.enter_zip_code))},
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                singleLine = true,
+                textStyle = TextStyle(textAlign = TextAlign.Center),
+                modifier = Modifier.fillMaxWidth()
             )
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row (
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        ){
+            Button(
+                onClick = {
+                    if (zipCode.length == 5) {
+                        weatherViewModel.fetchWeather(zipCode, "a1160aed969479de39cbe27819c9de63")
+                    } else {
+                        Toast.makeText(context, context.getString(R.string.invalid_zip), Toast.LENGTH_SHORT).show()
+                    }
+                },
+            ) {
+                Text(text = stringResource(R.string.get_weather))
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Button(
+                onClick = {
+                    if (zipCode.length == 5) {
+                        val intent = Intent(context, com.example.uniqueweatherapp.ui.ForecastActivity::class.java)
+                        intent.putExtra("ZIP_CODE", zipCode)
+                        context.startActivity(intent)
+                    } else {
+                        Toast.makeText(context, context.getString(R.string.invalid_zip), Toast.LENGTH_SHORT).show()
+                    }
+                },
+            ) {
+                Text(text = stringResource(R.string.forecast_label))
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
 
         weather?.let {
             Spacer(modifier = Modifier.height(24.dp))
@@ -212,10 +224,14 @@ fun WeatherScreen(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
             Spacer(modifier = Modifier.height(32.dp))
-            Column {
-                Text(text = stringResource(R.string.humidity_format, it.main.humidity))
-                Text(text = stringResource(R.string.pressure_format, it.main.pressure))
-            }
+
+            Text(text = stringResource(R.string.humidity_format, it.main.humidity),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+            Text(text = stringResource(R.string.pressure_format, it.main.pressure),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
+
         }
 
         Spacer(modifier = Modifier.height(12.dp))
