@@ -1,7 +1,10 @@
 package com.example.uniqueweatherapp
 
 import android.app.Activity
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.*
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -37,6 +40,10 @@ import com.example.uniqueweatherapp.viewmodel.WeatherViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.TextStyle
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import android.Manifest
 
 class MainActivity : ComponentActivity() {
 
@@ -73,12 +80,64 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     WeatherScreen(
                         modifier = Modifier.padding(innerPadding),
-                        weatherViewModel = weatherViewModel
+                        weatherViewModel = weatherViewModel,
+                        onRequestPermissionsAndNotify = {
+                            checkPermissionsAndStartService(this@MainActivity)
+                            requestNotificationPermissionAndShow(this@MainActivity)
+                        }
                     )
                 }
             }
         }
+
     }
+
+    private fun requestNotificationPermissionAndShow(context: Context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                    context as Activity,
+                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                    1001
+                )
+            } else {
+                showNotification(context)
+            }
+        } else {
+            showNotification(context)
+        }
+    }
+
+    private fun showNotification(context: Context) {
+        val channelId = "weather_notification_channel"
+        val notificationManager = ContextCompat.getSystemService(context, NotificationManager::class.java)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelId,
+                "Weather Notifications",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            notificationManager?.createNotificationChannel(channel)
+        }
+
+        val notification = NotificationCompat.Builder(context, channelId)
+            .setSmallIcon(R.drawable.sun) // Your app icon
+            .setContentTitle("Weather App")
+            .setContentText("Location-based weather update activated!")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .build()
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+
+            NotificationManagerCompat.from(context).notify(1002, notification)
+        }
+    }
+
+
+
 
     @Suppress("DEPRECATION")
     override fun onRequestPermissionsResult(
@@ -94,7 +153,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun WeatherScreen(
     modifier: Modifier = Modifier,
-    weatherViewModel: WeatherViewModel
+    weatherViewModel: WeatherViewModel,
+    onRequestPermissionsAndNotify: () -> Unit
 ) {
     val weather by weatherViewModel.weather.observeAsState()
     val errorMessage by weatherViewModel.errorMessage.observeAsState()

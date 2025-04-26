@@ -32,10 +32,8 @@ class LocationWeatherService : Service() {
         super.onCreate()
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        // 🔹 Immediately show a placeholder notification to avoid system kill
         showNotification("Loading", "--°", "Fetching...")
 
-        // 🔹 Then fetch actual weather info
         fetchLocationAndNotify()
     }
 
@@ -62,7 +60,6 @@ class LocationWeatherService : Service() {
                         locationName = "10001" // fallback zip code
                     }
 
-                    // Switch back to main thread for UI operations
                     launch(Dispatchers.Main) {
                         showNotification(condition, temperature, locationName)
                         sendWeatherBroadcast(temperature, condition, locationName)
@@ -106,7 +103,6 @@ class LocationWeatherService : Service() {
             .setOngoing(true)
             .build()
 
-        // 🔹 Required to meet Android's strict timing on foreground services
         startForeground(1, notification)
     }
 
