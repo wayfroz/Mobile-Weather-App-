@@ -123,7 +123,7 @@ class MainActivity : ComponentActivity() {
         }
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.drawable.sun) // Your app icon
+            .setSmallIcon(R.drawable.sun)
             .setContentTitle("Weather App")
             .setContentText("Location-based weather update activated!")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
