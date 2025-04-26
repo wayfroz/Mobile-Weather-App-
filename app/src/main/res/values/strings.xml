@@ -1,11 +1,14 @@
 <resources>
-    <string name="app_name">Sunshine Now</string>
-    <string name="city_name">St. Paul, MN</string>
-    <string name="temp">72°</string>
-    <string name="feels_like">Feels like 78°</string>
-    <string name="low">Low 65°</string>
-    <string name="high">High 80°</string>
-    <string name="humidity">Humidity 100%</string>
-    <string name="pressure">Pressure 1023 hPa</string>
-    <string name="sunny_icon">Sunny weather icon</string>
+    <string name="app_name">MW Weather App</string>
+    <string name="enter_zip_code">Enter Zip Code</string>
+    <string name="my_location">My Location</string>
+    <string name="get_weather">Get Weather</string>
+    <string name="forecast_label">16-Day Forecast</string>
+    <string name="invalid_zip">Invalid Zip Code</string>
+    <string name="temp_format">%.1f°C</string>
+    <string name="feels_like_format">Feels like %.1f°C</string>
+    <string name="humidity_format">Humidity: %1$d%%</string>
+    <string name="pressure_format">Pressure: %1$d hPa</string>
+    <string name="sunny_icon">Sunny icon</string>
+
 </resources>
