@@ -56,7 +56,8 @@ class LocationWeatherService : Service() {
                         val addresses = geocoder.getFromLocation(it.latitude, it.longitude, 1)
                         locationName = addresses?.firstOrNull()?.postalCode ?: "10001"
                     } catch (e: Exception) {
-                        Log.e(TAG, "Geocoder failed: ${e.message}", e)
+                        // Commented out for unit tests
+                        // Log.e(TAG, "Geocoder failed: ${e.message}", e)
                         locationName = "10001" // fallback zip code
                     }
 

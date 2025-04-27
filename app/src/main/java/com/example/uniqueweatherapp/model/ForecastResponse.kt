@@ -1,3 +1,4 @@
+package com.example.uniqueweatherapp.model
 import kotlinx.serialization.Serializable
 
 @Serializable

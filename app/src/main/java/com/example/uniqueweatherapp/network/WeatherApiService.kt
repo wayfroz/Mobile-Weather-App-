@@ -1,6 +1,6 @@
 package com.example.uniqueweatherapp.network
 
-import ForecastResponse
+import com.example.uniqueweatherapp.model.ForecastResponse
 import com.example.uniqueweatherapp.model.WeatherResponse
 import retrofit2.http.GET
 import retrofit2.http.Query

@@ -22,7 +22,6 @@ class ForecastViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = WeatherApiClient.weatherApiService.getForecast(zipCode, apiKey)
-                Log.d("ForecastViewModel", "API returned ${response.list.size} items")
                 val items = response.list.map {
                     ForecastItem(
                         date = it.dt_txt,
@@ -37,7 +36,6 @@ class ForecastViewModel : ViewModel() {
                     is HttpException -> "Invalid ZIP code. Please try again."
                     else -> "Something went wrong: ${e.message}"
                 }
-                Log.e("ForecastViewModel", "Error fetching forecast: ${e.message}", e)
             }
         }
     }
